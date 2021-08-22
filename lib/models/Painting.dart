@@ -32,5 +32,5 @@ class Painting {
         this.width = json['width'],
         this.height = json['height'],
         this.description = json['description'],
-        this.link = 'http://192.168.1.7:8000' + json['link'];
+        this.link = 'http://192.168.1.8:8000' + json['link'];
 }

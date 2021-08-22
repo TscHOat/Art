@@ -1,8 +1,14 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skripsian/components/addToCartButton.dart';
+import 'package:skripsian/models/Painting.dart';
+import 'package:skripsian/providers/cart_providers.dart';
+import 'package:skripsian/providers/wishlist_providers.dart';
 
 class WishlistItem extends StatelessWidget {
-  const WishlistItem({Key? key}) : super(key: key);
+  final Painting item;
+  const WishlistItem({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +17,7 @@ class WishlistItem extends StatelessWidget {
       child: Row(
         children: [
           Image.network(
-            'http://192.168.1.7:8000/images/IMG_7930.PNG',
+            item.link,
             width: 160,
             height: 125,
             fit: BoxFit.cover,
@@ -25,11 +31,12 @@ class WishlistItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Sudut Kota",
+                  item.title,
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
                 ),
                 Text(
-                  "Oil on Canvas | 60 x 70cm | 2020",
+                  [item.type, ("${item.height} x ${item.width}"), item.year]
+                      .join(" | "),
                   style: TextStyle(fontSize: 12),
                 ),
                 SizedBox(
@@ -43,22 +50,45 @@ class WishlistItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text("Checkout"),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          primary: Colors.black,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 20),
+                      Consumer<CartProvider>(
+                        builder: (context, cartProvider, _) {
+                          bool temp;
+                          if ("${cartProvider.getSpecificItemFromCartProvider(item.id)}" ==
+                              "null")
+                            temp = true;
+                          else
+                            temp = false;
+                          return ElevatedButton(
+                            onPressed: () {
+                              if (temp)
+                                cartProvider.addToCart(item);
+                              else
+                                cartProvider.deleteItemFromCart(
+                                    cartProvider.findItemIndexFromCartProvider(
+                                            item.id) ??
+                                        -1);
+                            },
+                            child: Text(temp ? "Add to bag" : "Remove"),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              primary: Colors.black,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
+                            ),
+                          );
+                        },
+                      ),
+                      Consumer<WishlistProvder>(
+                        builder: (context, wishlistProvider, child) =>
+                            IconButton(
+                          icon: Icon(EvaIcons.trashOutline),
+                          onPressed: () {
+                            wishlistProvider.removeItem(item.id);
+                          },
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(EvaIcons.trashOutline),
-                        onPressed: () {},
-                      )
                     ],
                   ),
                 ),

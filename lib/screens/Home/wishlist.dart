@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:skripsian/components/wishlistItem.dart';
+import 'package:skripsian/providers/wishlist_providers.dart';
 
 class Wishlist extends StatefulWidget {
   Wishlist({Key? key}) : super(key: key);
@@ -19,13 +21,13 @@ class _WishlistState extends State<Wishlist> {
         ),
       ),
       body: Container(
-        child: ListView(
-          children: [
-            WishlistItem(),
-            WishlistItem(),
-            WishlistItem(),
-          ],
-        ),
+        child: Consumer<WishlistProvder>(
+            builder: (context, wishlistProvider, child) => ListView(
+                  children: [
+                    for (var item in wishlistProvider.getItems())
+                      WishlistItem(item: item),
+                  ],
+                )),
       ),
     );
   }

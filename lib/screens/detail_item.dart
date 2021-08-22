@@ -6,6 +6,7 @@ import 'package:skripsian/ar_page.dart';
 import 'package:skripsian/components/addToCartButton.dart';
 import 'package:skripsian/models/Painting.dart';
 import 'package:skripsian/providers/cart_providers.dart';
+import 'package:skripsian/providers/wishlist_providers.dart';
 
 class DetailItemPage extends StatelessWidget {
   final Painting painting;
@@ -131,13 +132,35 @@ class DetailItemPage extends StatelessWidget {
                           // color: Colors.black,
                           child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                EvaIcons.heartOutline,
-                                size: 50,
-                              )),
+                          Consumer<WishlistProvder>(
+                              builder: (context, wishlistProvider, child) {
+                            bool isOnWishlist =
+                                wishlistProvider.isOnWishlist(painting.id);
+                            return SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: IconButton(
+                                padding: new EdgeInsets.all(0.0),
+                                onPressed: () {
+                                  if (!isOnWishlist)
+                                    wishlistProvider.addItem(painting);
+                                  else
+                                    wishlistProvider.removeItem(painting.id);
+                                },
+                                icon: Icon(
+                                  (isOnWishlist
+                                      ? EvaIcons.heart
+                                      : EvaIcons.heartOutline),
+                                  size: 50,
+                                  color: (isOnWishlist
+                                      ? Colors.red
+                                      : Colors.black),
+                                ),
+                              ),
+                            );
+                          }),
                           SizedBox(
                             width: 20,
                           ),
